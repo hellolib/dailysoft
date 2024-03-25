@@ -23,5 +23,5 @@ go.work
 
 # custom
 .idea
-
+.DS_Store
 
