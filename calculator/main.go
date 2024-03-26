@@ -2,43 +2,39 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"strconv"
 )
 
+// 使用fyne开发一个数学计算器(+-*/)
+
 func main() {
+	// 1. 编写一个计算器整体的窗体框架
 	myApp := app.New()
-	myWindow := myApp.NewWindow("Calculator")
-
+	myWindow := myApp.NewWindow("计算器")
 	display := widget.NewEntry()
-	display.Text = "0"
-	// display.ReadOnly = true
-	// display.Alignment = widget.AlignmentTrailing
 
+	// 2. 定义一些初始值
+	display.Text = "0"
 	var firstNumber float64
 	var operation string
 
-	// Function to handle number button click
+	// 3. 定义数字按钮点击时所执行的函数
 	appendNumber := func(num string) {
-		if display.Text == "0" {
-			display.Text = num
-		} else {
-			display.Text += num
-		}
-	}
-
-	// Function to handle operation button click
-	doOperation := func(op string) {
-		firstNumber, _ = strconv.ParseFloat(display.Text, 64)
-		operation = op
-		display.Text = "0"
+		display.Text = num
 		display.Refresh()
 	}
 
-	// Function to handle equal button click
+	// 4. 定义运算按钮的回调函数
+	doOperation := func(op string) {
+		firstNumber, _ = strconv.ParseFloat(display.Text, 64)
+		operation = op
+	}
+
+	// 5. 定义计算结果时的计算函数
 	calculate := func() {
 		secondNumber, _ := strconv.ParseFloat(display.Text, 64)
 		var result float64
@@ -50,26 +46,25 @@ func main() {
 		case "*":
 			result = firstNumber * secondNumber
 		case "/":
+			result = firstNumber / secondNumber
 			if secondNumber == 0 {
-				display.Text = "Error"
+				display.Text = "ERROR"
 				return
 			}
-			result = firstNumber / secondNumber
 		}
 		display.Text = fmt.Sprintf("%f", result)
 		display.Refresh()
-		fmt.Println(result)
 	}
 
-	// Function to handle clear button click
-	clear := func() {
+	// 6. 第一个清理按钮的回调函数
+	clearButton := func() {
 		display.Text = "0"
 		firstNumber = 0
 		operation = ""
 		display.Refresh()
 	}
 
-	// Buttons
+	// 定义计算器的所有按钮
 	button0 := widget.NewButton("0", func() { appendNumber("0") })
 	button1 := widget.NewButton("1", func() { appendNumber("1") })
 	button2 := widget.NewButton("2", func() { appendNumber("2") })
@@ -85,8 +80,9 @@ func main() {
 	buttonMultiply := widget.NewButton("*", func() { doOperation("*") })
 	buttonDivide := widget.NewButton("/", func() { doOperation("/") })
 	buttonEquals := widget.NewButton("=", calculate)
-	buttonClear := widget.NewButton("C", clear)
+	buttonClear := widget.NewButton("C", clearButton)
 
+	// 整齐排列按钮
 	buttons := container.NewGridWithColumns(4,
 		button7, button8, button9, buttonDivide,
 		button4, button5, button6, buttonMultiply,
@@ -96,8 +92,9 @@ func main() {
 
 	myWindow.SetContent(container.NewVBox(
 		display,
+		// 添加这些按钮到计算器中
 		buttons,
 	))
-
+	myWindow.Resize(fyne.NewSize(200, 200))
 	myWindow.ShowAndRun()
 }
